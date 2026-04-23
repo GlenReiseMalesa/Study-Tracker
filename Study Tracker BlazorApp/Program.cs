@@ -13,15 +13,33 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 
 //DB code
-// Register DbContext Factory (REQUIRED for WebAssembly)
-builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlite("Data Source=app.db"));
+try
+{
+    // Your service registration
+    builder.Services.AddDbContextFactory<AppDbContext>(options =>
+        options.UseSqlite("Data Source=app.db"));
+    builder.Services.AddScoped<DatabaseService>();
+    builder.Services.AddScoped<TaskService>();
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-// Register our database service
-builder.Services.AddScoped<DatabaseService>();
+    var host = builder.Build();
+
+    // Add global error handling
+    var logger = host.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Application starting...");
+
+    //await host.RunAsync();
+    await builder.Build().RunAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR: {ex.Message}");
+    Console.WriteLine(ex.StackTrace);
+    throw;
+}
 //DB code
 
-await builder.Build().RunAsync();
+//await builder.Build().RunAsync();
 
 
 

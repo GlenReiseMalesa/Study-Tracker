@@ -1,33 +1,56 @@
-﻿using Study_Tracker_BlazorApp.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.JSInterop;
-
+﻿using Microsoft.EntityFrameworkCore;
+using Study_Tracker_BlazorApp.Data;
 
 namespace Study_Tracker_BlazorApp.Services;
 
 public class DatabaseService
 {
-    private readonly IJSRuntime _jsRuntime;
     private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
-    public DatabaseService(IJSRuntime jsRuntime, IDbContextFactory<AppDbContext> dbContextFactory)
+    public DatabaseService(IDbContextFactory<AppDbContext> dbContextFactory)
     {
-        _jsRuntime = jsRuntime;
         _dbContextFactory = dbContextFactory;
     }
 
     public async Task InitializeDatabaseAsync()
     {
-        const string filename = "app.db";
+        try
+        {
+            Console.WriteLine("=== Starting Database Initialization ===");
 
-        // 1. Restore existing database from browser cache
-        await _jsRuntime.InvokeVoidAsync("blazorSqlite.loadDatabaseFromCache", filename);
+            // Create database and tables
+            await using var context = await _dbContextFactory.CreateDbContextAsync();
+            var created = await context.Database.EnsureCreatedAsync();
+            Console.WriteLine($"Database created/checked: {created}");
 
-        // 2. Create/update database schema
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-        await context.Database.EnsureCreatedAsync();
+            // Add sample data if this is a new database
+            if (created)
+            {
+                Console.WriteLine("Adding sample data...");
+                if (!await context.TaskItems.AnyAsync())
+                {
+                    context.TaskItems.AddRange(
+                        new Models.TaskItem { Title = "Learn Blazor WASM", IsCompleted = false, CreatedAt = DateTime.Now },
+                        new Models.TaskItem { Title = "Build a study tracker", IsCompleted = false, CreatedAt = DateTime.Now },
+                        new Models.TaskItem { Title = "Master SQLite", IsCompleted = false, CreatedAt = DateTime.Now }
+                    );
+                    await context.SaveChangesAsync();
+                    Console.WriteLine(" Sample data added");
+                }
+            }
 
-        // 3. Save the database to cache (for new or updated databases)
-        await _jsRuntime.InvokeVoidAsync("blazorSqlite.syncDatabaseToCache", filename);
+            // Verify table exists
+            var tableExists = await context.Database.ExecuteSqlRawAsync(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='TaskItems'");
+            Console.WriteLine($"Table verification completed");
+
+            Console.WriteLine("=== Database Initialization Complete ===");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+            throw;
+        }
     }
 }

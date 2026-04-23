@@ -1,4 +1,9 @@
 ﻿@page "/"
+@using Study_Tracker_BlazorApp.Services
+@using Study_Tracker_BlazorApp.Models
+@inject TaskService TaskService
+@inject DatabaseService DatabaseService
+@inject NavigationManager Navigation
 
 <PageTitle>Home</PageTitle>
 
@@ -31,38 +36,54 @@
     <!-- Main Tracker area: Weekly study plan + Today's tasks (no JS checkboxes) -->
     <div class="dashboard-split">
         <!-- LEFT PANEL: Weekly Study Schedule (Checklist) -->
-        <div class="plan-panel">
-            <div class="section-title">📅 Weekly Study Plan</div>
-            <table class="study-table">
-                <thead>
-                    <tr><th>Day</th><th>Subject / Topic</th><th>Time</th><th class="checkbox-cell">Done ✓</th></tr>
-                </thead>
-                <tbody>
-                    <!-- Monday -->
-                    <tr><td>Mon</td><td><span class="subject-badge">Mathematics</span> - Algebra & Functions</td><td>15:00–16:30</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Mon</td><td><span class="subject-badge">English</span> - Essay writing</td><td>17:00–18:00</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <!-- Tuesday -->
-                    <tr><td>Tue</td><td><span class="subject-badge">Physical Science</span> - Mechanics</td><td>14:30–16:00</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Tue</td><td><span class="subject-badge">Life Orientation</span> - Study skills</td><td>16:30–17:30</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <!-- Wednesday -->
-                    <tr><td>Wed</td><td><span class="subject-badge">Mathematics</span> - Trigonometry</td><td>15:00–16:30</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Wed</td><td><span class="subject-badge">History</span> - Apartheid & Democracy SA</td><td>17:00–18:15</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <!-- Thursday -->
-                    <tr><td>Thu</td><td><span class="subject-badge">Geography</span> - Climatology</td><td>14:30–15:45</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Thu</td><td><span class="subject-badge">English</span> - Poetry analysis</td><td>16:00–17:00</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <!-- Friday -->
-                    <tr><td>Fri</td><td><span class="subject-badge">Physical Science</span> - Chemistry revision</td><td>15:00–16:30</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Fri</td><td><span class="subject-badge">Mathematics</span> - Past paper practice</td><td>17:00–18:30</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <!-- Weekend catch-up -->
-                    <tr><td>Sat</td><td><span class="subject-badge">Revision / weak topics</span> - Self study</td><td>09:00–11:00</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Sun</td><td><span class="subject-badge">Rest & Plan</span> - Weekly review</td><td>16:00–17:00</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                </tbody>
-            </table>
-            <div class="manual-progress">
-                💡 Tip: Tick the checkboxes as you complete each study session. No account needed — your progress stays on this page.
+       
+        
+        <!-- TaskItems Table-->
+       @if (isLoading == true)
+        {
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
-        </div>
+        }
+        else if (TaskItems.Count == 0)
+        {
+            <div class="alert alert-info">
+                No products found. Click "Add New Product" to get started!
+            </div>
+        }
+        else
+        {
+            <div class="plan-panel">
+                <div class="section-title">📅 Weekly Study Plan</div>
+                <table class="study-table">
+                    <thead>
+                        <tr><th>Day</th><th>Subject / Topic</th><th>Time</th><th class="checkbox-cell">Done ✓</th></tr>
+                    </thead>
+                    <tbody>
+                       
+                        @foreach (var taskitem in TaskItems){
+                            <tr>
+                                <td>Mon</td>
+                                <td><span class="subject-badge">Mathematics</span></td>
+                                <td>15:00–16:30</td>
+                                <td class="checkbox-cell"><input type="checkbox"></td>
+                            </tr>
+                        }
 
+                    </tbody>
+                </table>
+
+
+
+
+                <div class="manual-progress">
+                    💡 Tip: Tick the checkboxes as you complete each study session. No account needed — your progress stays on this page.
+                </div>
+            </div>
+
+        }
         <!-- RIGHT PANEL: Today's active tasks & priority tracker (interactive checkboxes) -->
         <div class="task-panel">
             <div class="section-title">⭐ Today's Study Missions</div>
@@ -171,3 +192,46 @@
         <div>Study Tracker App – designed for SA learners. No sign-up, no distractions. All your study plans in one clean HTML page.</div>
     </div>
 </div>
+
+@code {
+    private List<TaskItem> TaskItems = new();
+    private bool isLoading = false;
+    private bool showModal = false;
+    private TaskItem? editingTaskItem = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTaskItems();
+    } 
+
+    private async Task LoadTaskItems()
+    {
+        isLoading = true;
+        TaskItems = await TaskService.GetAllTaskItemsAsync();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleSave(TaskItem TaskItem)
+    {
+        if(TaskItem.Id == 0)
+        {
+            //create new product
+            await TaskService.CreateTaskItemAsync(TaskItem);
+        }
+        else
+        {
+            //Update
+        }
+
+        CloseModal();
+        await LoadTaskItems();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        editingTaskItem = null;
+        StateHasChanged();
+    }
+}
