@@ -705,4 +705,38 @@
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
+
+
+
+
 </html>
+<script>
+    window.blazorSqlite = {
+        // Load database from browser cache on startup
+        loadDatabaseFromCache: async function (filename) {
+            const cache = await caches.open('BlazorSqliteCache');
+            const cacheKey = `/data/${filename}`;
+            const cachedResponse = await cache.match(cacheKey);
+
+            if (cachedResponse) {
+                const data = await cachedResponse.arrayBuffer();
+                FS.writeFile(cacheKey, new Uint8Array(data));
+                console.log(`Database loaded from cache: ${filename}`);
+            } else {
+                console.log(`No cached database found for: ${filename}`);
+            }
+        },
+
+        // Save database to browser cache
+        syncDatabaseToCache: async function (filename) {
+            const cache = await caches.open('BlazorSqliteCache');
+            const cacheKey = `/data/${filename}`;
+
+            if (FS.analyzePath(cacheKey).exists) {
+                const data = FS.readFile(cacheKey);
+                await cache.put(cacheKey, new Response(data));
+                console.log(`Database saved to cache: ${filename}`);
+            }
+        }
+    };
+</script>
