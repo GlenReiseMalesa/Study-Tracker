@@ -3,8 +3,7 @@
 
 StudyTracker/
 ├── Models/
-│   └── Subject.cs          # Database table definition
-│   └── Assignment.cs
+│   └── TaskItem.cs          # Database table definition
 ├── Data/
 │   └── AppDbContext.cs      # Database connection and configuration
 ├── Services/
