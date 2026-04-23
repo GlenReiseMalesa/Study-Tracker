@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Study Tracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc30403f1d1b876ff772ce8587e56472d1b40993")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da25cf8f2398ddea9bf616486660786081c87f92")]
 [assembly: System.Reflection.AssemblyProductAttribute("Study Tracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Study Tracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
