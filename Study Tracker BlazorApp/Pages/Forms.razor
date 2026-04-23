@@ -62,7 +62,7 @@
                     <textarea name="notes" rows="2" @bind="newNotes" placeholder="Additional details...">Focus on past papers</textarea>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary" @onclick="AddTodo" disabled="@string.IsNullOrWhiteSpace(newTodoTitle)">➕ Add New Task (Demo)</button>
+                    <button type="button" class="btn btn-primary" @onclick="AddTodo" disabled="@string.IsNullOrWhiteSpace(newTodoTitle)">➕ Add New Task (Demo)</button>
                     <button type="reset" class="btn btn-secondary">🗑️ Clear Form</button>
                 </div>
             </form>
@@ -307,7 +307,6 @@
                 EstimatedTime = newEstimatedTime,
                 Priority = newPriority,
                 IsCompleted = newIsCompleted,
-                Id = newId,
                 Notes= newNotes
             };
 
