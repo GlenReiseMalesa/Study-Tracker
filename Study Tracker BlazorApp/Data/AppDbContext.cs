@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Study_Tracker.Models;
+using Study_Tracker_BlazorApp.Models;
 
-namespace Study_Tracker.Data
+namespace Study_Tracker_BlazorApp.Data
 {
     //DbContext is the database connection manager
     public class AppDbContext : DbContext

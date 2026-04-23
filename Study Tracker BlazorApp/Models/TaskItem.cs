@@ -1,4 +1,4 @@
-﻿namespace Study_Tracker.Models
+﻿namespace Study_Tracker_BlazorApp.Models
 {
     public class TaskItem
     {
