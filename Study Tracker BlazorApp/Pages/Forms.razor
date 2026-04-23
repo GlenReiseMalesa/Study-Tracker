@@ -1,4 +1,12 @@
 ﻿@page "/forms"
+@using Microsoft.EntityFrameworkCore
+@using Study_Tracker_BlazorApp.Data
+@using Study_Tracker_BlazorApp.Services
+@using Study_Tracker_BlazorApp.Models
+@inject TaskService TaskService
+@inject DatabaseService DatabaseService
+@inject NavigationManager Navigation
+@inject IDbContextFactory<AppDbContext> DbContextFactory
 
 <PageTitle>Organize Tasks</PageTitle>
 
@@ -24,7 +32,8 @@
                 <!-- Hidden fields to simulate edit mode (pure HTML/CSS) -->
                 <div class="form-group">
                     <label>📌 Task Title *</label>
-                    <input type="text" name="title" placeholder="e.g., Master Trigonometry" required value="Mathematics Revision">
+                    <input type="text" @bind="newTodoTitle"
+                           placeholder="Enter a new task..." @onkeypress="OnKeyPress" />
                 </div>
                 <div class="form-group">
                     <label>📚 Subject / Module</label>
@@ -54,7 +63,7 @@
                     <textarea name="notes" rows="2" placeholder="Additional details...">Focus on past papers</textarea>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary">➕ Add New Task (Demo)</button>
+                    <button type="submit" class="btn btn-primary" @onclick="AddTodo" disabled="@string.IsNullOrWhiteSpace(newTodoTitle)">➕ Add New Task (Demo)</button>
                     <button type="reset" class="btn btn-secondary">🗑️ Clear Form</button>
                 </div>
             </form>
@@ -235,5 +244,73 @@
 
 
 @code {
+    private List<TaskItem> TaskItems = new();
+    private bool isLoading = false;
+    private bool showModal = false;
+    private TaskItem? editingTaskItem = null;
+    private string newTodoTitle = string.Empty;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTaskItems();
+    }
+
+    private async Task LoadTaskItems()
+    {
+        isLoading = true;
+        TaskItems = await TaskService.GetAllTaskItemsAsync();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleSave(TaskItem TaskItem)
+    {
+        if (TaskItem.Id == 0)
+        {
+            //create new product
+            await TaskService.CreateTaskItemAsync(TaskItem);
+        }
+        else
+        {
+            //Update
+        }
+
+        CloseModal();
+        await LoadTaskItems();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        editingTaskItem = null;
+        StateHasChanged();
+    }
+
+    private async Task AddTodo()
+    {
+        if (string.IsNullOrWhiteSpace(newTodoTitle)){
+            return;
+        }
+
+        var task = new TaskItem
+            {
+                Title = newTodoTitle.Trim(),
+                CreatedAt = DateTime.Now,
+            };
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+        context.TaskItems.Add(task);
+        await context.SaveChangesAsync();
+        newTodoTitle = string.Empty;
+        await LoadTaskItems();
+
+    }
+
+    private async Task OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(newTodoTitle))
+        {
+            await AddTodo();
+        }
+    }
 }
