@@ -410,52 +410,52 @@
             font-weight: 500;
         }
 
-        /* Stats Cards - static counters (updated via form submissions, but we use meta refresh? 
+        /* Stats Cards - static counters (updated via form submissions, but we use meta refresh?
            No JS means data persistence relies on server? But we can't store without backend.
-           Since NO JS, we create a demo CRUD that works via PHP-style? But pure HTML/CSS cannot 
-           permanently store data without backend. However, we can simulate CRUD using 
-           #anchors and forms that submit to same page with GET/POST, but without JS, we need 
-           a backend. BUT to satisfy "crud page without js" - we design a fully functional 
-           CRUD interface that uses HTML forms + a local mock approach? Actually standard 
-           HTML/CSS alone cannot modify DOM or store data. But we can build a 'static CRUD 
-           simulation' using multiple pages or form submissions to self with query parameters. 
-           I'll build a REAL CRUD simulation that uses GET parameters and hidden inputs, 
-           and uses the browser's ability to submit forms to the same page, and we will 
-           parse the query string using a trick? No JS means no parsing. However we can use 
-           <form> and target _self, but without server, we can't process. So to truly give 
-           a no-js CRUD experience, I'll build an interactive interface that uses multiple 
+           Since NO JS, we create a demo CRUD that works via PHP-style? But pure HTML/CSS cannot
+           permanently store data without backend. However, we can simulate CRUD using
+           #anchors and forms that submit to same page with GET/POST, but without JS, we need
+           a backend. BUT to satisfy "crud page without js" - we design a fully functional
+           CRUD interface that uses HTML forms + a local mock approach? Actually standard
+           HTML/CSS alone cannot modify DOM or store data. But we can build a 'static CRUD
+           simulation' using multiple pages or form submissions to self with query parameters.
+           I'll build a REAL CRUD simulation that uses GET parameters and hidden inputs,
+           and uses the browser's ability to submit forms to the same page, and we will
+           parse the query string using a trick? No JS means no parsing. However we can use
+           <form> and target _self, but without server, we can't process. So to truly give
+           a no-js CRUD experience, I'll build an interactive interface that uses multiple
            HTML pages? That's not ideal.
-           
-           Wait: A truly functional CRUD without JS is impossible on client-side only. 
-           But the user asked "create a crud page without js" — probably meaning a 
-           mockup/design that shows CRUD elements (buttons, forms, list) but without 
-           JavaScript interactivity. I'll build a beautiful, fully designed CRUD 
-           interface with working forms that demonstrate CREATE, READ, UPDATE, DELETE 
-           functionality by using form submits to the same page and relying on 
+
+           Wait: A truly functional CRUD without JS is impossible on client-side only.
+           But the user asked "create a crud page without js" — probably meaning a
+           mockup/design that shows CRUD elements (buttons, forms, list) but without
+           JavaScript interactivity. I'll build a beautiful, fully designed CRUD
+           interface with working forms that demonstrate CREATE, READ, UPDATE, DELETE
+           functionality by using form submits to the same page and relying on
            browser's native behavior? But without backend, data won't persist.
-           
-           I'll build a NO-JS demo with placeholders and explain that actual data 
+
+           I'll build a NO-JS demo with placeholders and explain that actual data
            persistence would require backend. But I'll include a "localStorage alternative"?
-           That's JS. So to strictly follow "without js", I'll create a visually complete 
-           CRUD template that has all UI elements, and includes HTML attributes like 
-           required, readonly, etc. For demo, each form will have action="#", 
-           and data is shown via pre-filled examples. User can "simulate" CRUD by 
+           That's JS. So to strictly follow "without js", I'll create a visually complete
+           CRUD template that has all UI elements, and includes HTML attributes like
+           required, readonly, etc. For demo, each form will have action="#",
+           and data is shown via pre-filled examples. User can "simulate" CRUD by
            refreshing, but I'll create a 'manual edit' using contenteditable? No.
-           
-           Given constraints, I'll deliver a robust, stunning CRUD study tracker 
-           that works WITHOUT JavaScript, using HTML/CSS only, but with a clear 
-           design that shows Create, Read, Update, Delete sections. For true 
-           functionality without JS, we rely on <form> and display data using 
+
+           Given constraints, I'll deliver a robust, stunning CRUD study tracker
+           that works WITHOUT JavaScript, using HTML/CSS only, but with a clear
+           design that shows Create, Read, Update, Delete sections. For true
+           functionality without JS, we rely on <form> and display data using
            static table rows but user can add entries? That requires backend.
-           However the best no-js approach for a pure frontend is to provide a 
+           However the best no-js approach for a pure frontend is to provide a
            PRINTABLE/static template. But the user expects something impressive.
-           
-           I'll build a fully functional NO-JS CRUD where each record has 
-           "Edit" and "Delete" links that open pre-filled forms, and "Create" 
+
+           I'll build a fully functional NO-JS CRUD where each record has
+           "Edit" and "Delete" links that open pre-filled forms, and "Create"
            opens a new form, all using anchor links and manual data management.
-           The data is stored in a static table, but the user can copy/modify 
+           The data is stored in a static table, but the user can copy/modify
            manually — still a valid "CRUD page" concept without JS.
-           
+
            To exceed expectations, I'll create a complete study tracker with:
            - Add new task (form that sends email? No, just resets)
            - Edit and Delete buttons that link to editable sections
@@ -683,8 +683,6 @@
                 font-size: 0.75rem;
             }
         }
-    
-
     </style>
 </head>
 
@@ -702,7 +700,88 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    
+
+    <script>
+        window.blazorSqlite = {
+            // Helper to wait for FS to be available
+            waitForFS: async function () {
+                let attempts = 0;
+                while (typeof FS === 'undefined' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                if (typeof FS === 'undefined') {
+                    console.error('FS never became available after 5 seconds');
+                    return false;
+                }
+                console.log('FS is ready');
+                return true;
+            },
+
+            loadDatabaseFromCache: async function (filename) {
+                console.log("Loading database from cache:", filename);
+
+                const fsReady = await this.waitForFS();
+                if (!fsReady) return;
+
+                try {
+                    const cache = await caches.open('BlazorSqliteCache');
+                    const cacheKey = `/data/${filename}`;
+                    const cachedResponse = await cache.match(cacheKey);
+
+                    if (cachedResponse) {
+                        const data = await cachedResponse.arrayBuffer();
+                        // Ensure /data directory exists
+                        if (!FS.analyzePath('/data').exists) {
+                            FS.mkdir('/data');
+                        }
+                        FS.writeFile(cacheKey, new Uint8Array(data));
+                        console.log(`✅ Database loaded from cache: ${filename}`);
+                    } else {
+                        console.log(`ℹ️ No cached database found for: ${filename}`);
+                        // Ensure /data directory exists anyway
+                        if (!FS.analyzePath('/data').exists) {
+                            FS.mkdir('/data');
+                            console.log('Created /data directory');
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading database:", error);
+                }
+            },
+
+            syncDatabaseToCache: async function (filename) {
+                console.log("Syncing database to cache:", filename);
+
+                const fsReady = await this.waitForFS();
+                if (!fsReady) return;
+
+                try {
+                    const cache = await caches.open('BlazorSqliteCache');
+                    const cacheKey = `/data/${filename}`;
+
+                    // Create directory if it doesn't exist
+                    if (!FS.analyzePath('/data').exists) {
+                        FS.mkdir('/data');
+                        console.log('Created /data directory');
+                    }
+
+                    if (FS.analyzePath(cacheKey).exists) {
+                        const data = FS.readFile(cacheKey);
+                        await cache.put(cacheKey, new Response(data));
+                        console.log(`✅ Database saved to cache: ${filename}`);
+                    } else {
+                        console.log(`⚠️ Database file not found at: ${cacheKey}`);
+                    }
+                } catch (error) {
+                    console.error("Error syncing database:", error);
+                }
+            }
+        };
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
+    
 </body>
 
 
@@ -710,33 +789,3 @@
 
 
 </html>
-<script>
-    window.blazorSqlite = {
-        // Load database from browser cache on startup
-        loadDatabaseFromCache: async function (filename) {
-            const cache = await caches.open('BlazorSqliteCache');
-            const cacheKey = `/data/${filename}`;
-            const cachedResponse = await cache.match(cacheKey);
-
-            if (cachedResponse) {
-                const data = await cachedResponse.arrayBuffer();
-                FS.writeFile(cacheKey, new Uint8Array(data));
-                console.log(`Database loaded from cache: ${filename}`);
-            } else {
-                console.log(`No cached database found for: ${filename}`);
-            }
-        },
-
-        // Save database to browser cache
-        syncDatabaseToCache: async function (filename) {
-            const cache = await caches.open('BlazorSqliteCache');
-            const cacheKey = `/data/${filename}`;
-
-            if (FS.analyzePath(cacheKey).exists) {
-                const data = FS.readFile(cacheKey);
-                await cache.put(cacheKey, new Response(data));
-                console.log(`Database saved to cache: ${filename}`);
-            }
-        }
-    };
-</script>
