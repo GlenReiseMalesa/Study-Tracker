@@ -138,6 +138,7 @@
         await LoadTaskItems();
     } 
 
+    //Read all
     private async Task LoadTaskItems()
     {
         isLoading = true;
@@ -147,21 +148,7 @@
         //StateHasChanged();
     }
 
-    private async Task HandleSave(TaskItem TaskItem)
-    {
-        if(TaskItem.Id == 0)
-        {
-            //create new product
-            await TaskService.CreateTaskItemAsync(TaskItem);
-        }
-        else
-        {
-            //Update
-        }
-
-        CloseModal();
-        await LoadTaskItems();
-    }
+  
 
     private void CloseModal()
     {
