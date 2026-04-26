@@ -17,12 +17,12 @@ namespace Study_Tracker_BlazorApp.Services
         }
 
         // READ : Get single taskitem
-        public async Task<TaskItem?> GetTaskItemsByTitleAsync(String Title)
+        public async Task<TaskItem?> GetTaskItemsByIdAsync(int Id)
         {
             await using var context = await _dbContextFactory.CreateDbContextAsync();
             return await context.TaskItems
                 .Include(p => p.Subject)
-                .FirstOrDefaultAsync(p => p.Title == Title);
+                .FirstOrDefaultAsync(p => p.Id == Id);
         }
 
 
