@@ -30,7 +30,7 @@
     <div class="crud-layout">
         <!-- CREATE / UPDATE PANEL - Manual form for adding/editing tasks (No JS, just UI) -->
         <div class="form-panel">
-            <div class="section-title">✏️ Create / Edit Study Task</div>
+            <div class="section-title">✏️ Create / Edit Study Task </div>
             <form action="#" method="get" id="createTaskForm">
                 <!-- Hidden fields to simulate edit mode (pure HTML/CSS) -->
                 <div class="form-group">
@@ -74,8 +74,41 @@
             </div>
         </div>
 
+
+
+
         <!-- READ / UPDATE / DELETE PANEL - Task list with inline edit/delete links -->
         <div class="list-panel">
+
+            <!-- Edit section -->
+            @if (!string.IsNullOrEmpty(queryidstr))
+            {
+                <div style="margin-bottom: 2rem; background: #fef2e8; border-radius: 1.5rem; padding: 1rem;">
+                    <div class="section-title" style="font-size: 1.2rem;">✏️ Update Task </div>
+                    <p style="margin-bottom: 10px; font-size:0.85rem;">Click any "Edit" link above to jump — here's a pre-filled edit form for <strong>"Mathematics Revision"</strong></p>
+                    <form action="#" method="get">
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                            <input type="text" value="Complete Functions & Graphs"  placeholder="Title">
+                            <input type="text" value="Mathematics"  placeholder="Subject">
+                            <input type="text" value="1.5 hours"  placeholder="Time">
+                            <select >
+                                <option>High</option>
+                                <option selected>Medium</option>
+                                <option>Low</option>
+                            </select>
+                            <select >
+                                <option selected>Pending</option>
+                                <option>Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="padding: 6px 16px;">💾 Update Task</button>
+                        </div>
+                        <div class="info-note" style="margin-top: 8px;">✅ This demonstrates the UPDATE operation in CRUD. Modify fields and click update (UI demo without backend).</div>
+
+                    </form>
+                </div>
+
+            }
+
             <div class="section-title">📋 Study Task List (CRUD Operations)</div>
 
             <!-- Search/filter UI (visual only) -->
@@ -105,7 +138,7 @@
                                 <td>@taskitem.Priority</td>
                                 <td>@taskitem.IsCompleted</td>
                                 <td class="action-links">
-                                    <a href="#edit-task-1" class="edit-link">✏️ Edit</a>
+                                    <a href="/forms?queryid=@taskitem.Id" class="edit-link">✏️ Edit</a>
                                     <a href="/forms" class="delete-link" @onclick="() => DeleteTaskItem(taskitem.Id)">🗑️ Delete</a>
                                 </td>
                             </tr>
@@ -116,29 +149,7 @@
                 </table>
             </div>
 
-            <!-- Edit section simulation (inline edit forms for each task, demonstrating UPDATE) -->
-            <div style="margin-top: 2rem; background: #fef2e8; border-radius: 1.5rem; padding: 1rem;">
-                <div class="section-title" style="font-size: 1.2rem;">✏️ Update Task (Edit Example)</div>
-                <p style="margin-bottom: 10px; font-size:0.85rem;">Click any "Edit" link above to jump — here's a pre-filled edit form for <strong>"Mathematics Revision"</strong></p>
-                <form action="#" method="get">
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                        <input type="text" value="Complete Functions & Graphs" style="flex:2;" placeholder="Title">
-                        <input type="text" value="Mathematics" style="flex:1;" placeholder="Subject">
-                        <input type="text" value="1.5 hours" style="flex:1;" placeholder="Time">
-                        <select style="flex:1;">
-                            <option>High</option>
-                            <option selected>Medium</option>
-                            <option>Low</option>
-                        </select>
-                        <select style="flex:1;">
-                            <option selected>Pending</option>
-                            <option>Completed</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary" style="padding: 6px 16px;">💾 Update Task (Demo)</button>
-                    </div>
-                    <div class="info-note" style="margin-top: 8px;">✅ This demonstrates the UPDATE operation in CRUD. Modify fields and click update (UI demo without backend).</div>
-                </form>
-            </div>
+
 
 
         </div>
@@ -181,7 +192,14 @@
     private string newNotes = string.Empty;
     private bool newIsCompleted = false;
     public int newId = 1;
-  
+
+
+    //Query id/parameter
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "queryid")]
+    public string? queryidstr { get; set; }
+    
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -208,10 +226,6 @@
             
         
     }
-
-
-
- 
 
     private void CloseModal()
     {
