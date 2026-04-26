@@ -62,17 +62,19 @@
         {
             <div class="plan-panel">
                 <div class="section-title">📅 Weekly Study Plan</div>
-                <table class="study-table">
+                <table class="study-table" >
                     <thead>
-                        <tr><th>Day</th><th>Subject / Topic</th><th>Time</th><th class="checkbox-cell">Done ✓</th></tr>
+                        <tr><th>Topic</th><th>Subject</th><th>Time</th><th>Priority</th><th>Notes</th><th class="checkbox-cell">Done✓</th></tr>
                     </thead>
                     <tbody>
-                       
                         @foreach (var taskitem in TaskItems){
                             <tr>
-                                <td>Mon</td>
-                                <td><span class="subject-badge">Mathematics</span></td>
-                                <td>15:00–16:30</td>
+                                
+                                <td><span class="subject-badge">@taskitem.Title</span></td>
+                                <td>@taskitem.Subject</td>
+                                <td>@taskitem.EstimatedTime</td>
+                                <td>@taskitem.Priority</td>
+                                <td>@taskitem.Notes</td>
                                 <td class="checkbox-cell"><input type="checkbox"></td>
                             </tr>
                         }
@@ -89,61 +91,7 @@
             </div>
 
         }
-        <!-- RIGHT PANEL: Today's active tasks & priority tracker (interactive checkboxes) -->
-        <div class="task-panel">
-            <div class="section-title">⭐ Today's Study Missions</div>
-            <ul class="task-list">
-                <li class="task-item">
-                    <span class="task-check"><input type="checkbox"></span>
-                    <div class="task-detail">
-                        <div class="task-title">Review Mathematics – Functions & Graphs</div>
-                        <div class="task-subject">📐 Mathematics | 45 min</div>
-                    </div>
-                    <span class="task-priority">🔥 High</span>
-                </li>
-                <li class="task-item">
-                    <span class="task-check"><input type="checkbox"></span>
-                    <div class="task-detail">
-                        <div class="task-title">Physical Science practical questions (work, energy)</div>
-                        <div class="task-subject">⚛️ Physical Science | 1 hour</div>
-                    </div>
-                    <span class="task-priority">⭐ Medium</span>
-                </li>
-                <li class="task-item">
-                    <span class="task-check"><input type="checkbox"></span>
-                    <div class="task-detail">
-                        <div class="task-title">English: Read prescribed novel & notes</div>
-                        <div class="task-subject">📖 English HL | 30 min</div>
-                    </div>
-                    <span class="task-priority">📌 Normal</span>
-                </li>
-                <li class="task-item">
-                    <span class="task-check"><input type="checkbox"></span>
-                    <div class="task-detail">
-                        <div class="task-title">Geography: Mapwork and synoptic charts</div>
-                        <div class="task-subject">🌍 Geography | 40 min</div>
-                    </div>
-                    <span class="task-priority">✨ Medium</span>
-                </li>
-                <li class="task-item">
-                    <span class="task-check"><input type="checkbox"></span>
-                    <div class="task-detail">
-                        <div class="task-title">Life Orientation: Goal setting & exam prep</div>
-                        <div class="task-subject">🧠 LO | 25 min</div>
-                    </div>
-                    <span class="task-priority">📘 Low</span>
-                </li>
-            </ul>
-            <div style="margin-top: 1rem; background: #f2f5f9; border-radius: 1rem; padding: 0.8rem;">
-                <div style="font-weight: 600; margin-bottom: 6px;">📌 Custom task reminder (no login)</div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <label style="flex:2; font-weight: normal;">➕ Add your own study goal: </label>
-                    <input type="text" placeholder="e.g., Practice maths past paper" style="flex:3; padding: 8px; border-radius: 40px; border: 1px solid #ccc; background: white;">
-                    <span style="font-size: 0.7rem; color: #e67e22;">✍️ write & tick later</span>
-                </div>
-                <div class="info-note" style="margin-top: 8px;">Use the checkbox to track any custom task – manual entry, fully private.</div>
-            </div>
-        </div>
+   
     </div>
 
     <!-- Extra resources + Motivational message for South African students -->
@@ -155,29 +103,10 @@
         <div class="flag-emojis">🇿🇦 ✨ 📖</div>
     </div>
 
-    <!-- STUDY LOG section: no JS needed, just textarea for personal notes -->
-    <div class="study-notes">
-        <label for="studyJournal">📝 Study Journal & Reflection (no login, data stays local)</label>
-        <textarea id="studyJournal" rows="3" placeholder="Write your study reflections, difficult concepts, or achievements today... E.g., 'I mastered quadratic equations! Next: revise chemical bonding.'"></textarea>
-    </div>
+
 
     <!-- custom subjects / term planner without JS - just a table with additional subjects to track -->
     <div style="margin-top: 1.8rem;">
-        <div class="section-title">🗂️ Subject Tracker (CAPS aligned)</div>
-        <div style="overflow-x: auto;">
-            <table style="width:100%; border-collapse: collapse; background: #fefaf5; border-radius: 1rem;">
-                <thead>
-                    <tr style="background: #fae6d2;"><th>Subject</th><th>Exam Date (Q4)</th><th>Topics to revise</th><th>Check when done</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Mathematics</td><td>Nov 2026</td><td>Calculus, Stats, Euclidean Geometry</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Physical Science</td><td>Nov 2026</td><td>Electrostatics, Organic Chemistry</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>English HL</td><td>Oct/Nov</td><td>Unseen poetry, creative writing</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>Geography</td><td>Nov 2026</td><td>Rural/Urban settlement, GIS</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                    <tr><td>History</td><td>Nov 2026</td><td>Civil Rights, Independent Africa</td><td class="checkbox-cell"><input type="checkbox"></td></tr>
-                </tbody>
-            </table>
-        </div>
         <div class="custom-subject-note">
             🧭 <strong>No login & no JavaScript</strong> – All checkboxes work natively in HTML/CSS. Use them to mark completed topics,
             weekly sessions or revision blocks. Refresh the page keeps your ticks? Actually, checkboxes state is preserved until page reload/closed.
