@@ -20,9 +20,7 @@ namespace Study_Tracker_BlazorApp.Services
         public async Task<TaskItem?> GetTaskItemsByIdAsync(int Id)
         {
             await using var context = await _dbContextFactory.CreateDbContextAsync();
-            return await context.TaskItems
-                .Include(p => p.Subject)
-                .FirstOrDefaultAsync(p => p.Id == Id);
+            return await context.TaskItems.FirstOrDefaultAsync(t => t.Id == Id);
         }
 
 

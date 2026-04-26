@@ -81,7 +81,7 @@
         <div class="list-panel">
 
             <!-- Edit section -->
-            @if (!string.IsNullOrEmpty(queryidstr))
+            @if (!string.IsNullOrEmpty(queryidstr) && edittingItem!=null)
             {
                 
 
@@ -90,15 +90,15 @@
                     <p style="margin-bottom: 10px; font-size:0.85rem;">Click any "Edit" link above to jump — here's a pre-filled edit form for <strong>"Mathematics Revision"</strong></p>
                     <form action="#" method="get">
                         <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                            <input type="text" @bind="newTodoTitle"  placeholder="Title">
-                            <input type="text" @bind="newSubject" placeholder="Subject">
-                            <input type="text" @bind="newEstimatedTime" placeholder="Time">
-                            <select @bind="newPriority">
+                            <input type="text" @bind-value="edittingItem.Title" placeholder="Title">
+                            <input type="text" @bind-value="edittingItem.Subject" placeholder="Subject">
+                            <input type="text" @bind-value="edittingItem.EstimatedTime" placeholder="Time">
+                            <select @bind="edittingItem.Priority">
                                 <option>High</option>
                                 <option selected>Medium</option>
                                 <option>Low</option>
                             </select>
-                            <select @bind="newIsCompleted">
+                            <select @bind="edittingItem.IsCompleted">
                                 <option selected>Pending</option>
                                 <option>Completed</option>
                             </select>
@@ -140,7 +140,7 @@
                                 <td>@taskitem.Priority</td>
                                 <td>@taskitem.IsCompleted</td>
                                 <td class="action-links">
-                                    <a href="/forms?queryid=@taskitem.Id" class="edit-link">✏️ Edit</a>
+                                    <a href="/forms?queryid=@taskitem.Id" @onclick="() => LoadUpdateTaskItem()" class="edit-link">✏️ Edit</a>
                                     <a href="/forms" class="delete-link" @onclick="() => DeleteTaskItem(taskitem.Id)">🗑️ Delete</a>
                                 </td>
                             </tr>
@@ -185,15 +185,16 @@
     private List<TaskItem> TaskItems = new();
     private bool isLoading = false;
     private bool showModal = false;
-    private TaskItem? editingTaskItem = null;
 
     private string newTodoTitle = string.Empty;
     private string newSubject = string.Empty;
     private string newEstimatedTime = string.Empty;
+
     private string newPriority = "medium";
     private string newNotes = string.Empty;
     private bool newIsCompleted = false;
     public int newId = 1;
+    private TaskItem? edittingItem = null;
 
 
     //Query id/parameter
@@ -205,6 +206,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         await LoadTaskItems();
     }
 
@@ -212,7 +214,14 @@
     //read all
     private async Task LoadTaskItems()
     {
-        isLoading = true;
+        /*
+        @if (!string.IsNullOrEmpty(queryidstr))
+        {
+            // Get the task by ID from URL parameter
+            edittingItem = await TaskService.GetTaskItemsByIdAsync(int.Parse(queryidstr));
+            }
+        */
+                isLoading = true;
         await using var context = await DbFactoryContext.CreateDbContextAsync();
         TaskItems = await context.TaskItems.ToListAsync();
         isLoading = false;
@@ -232,23 +241,34 @@
     // Update Single task
     private async Task UpdateTaskItem()
     {
+
         int intId = 0;
         if (!string.IsNullOrEmpty(queryidstr))
         {
-          intId = int.Parse(queryidstr);
+            intId = int.Parse(queryidstr);
         }
 
-        var success = await TaskService.UpdateTaskAsync(intId, newTodoTitle, newSubject, newEstimatedTime, newPriority, newNotes, newIsCompleted);
+        var success = await TaskService.UpdateTaskAsync(intId, edittingItem.Title, edittingItem.Subject, edittingItem.EstimatedTime, edittingItem.Priority, edittingItem.Notes, edittingItem.IsCompleted);
 
         await LoadTaskItems();
 
 
     }
 
+    //load the d=single item for editting
+    private async void LoadUpdateTaskItem()
+    {
+        @if (!string.IsNullOrEmpty(queryidstr))
+        {
+            // Get the task by ID from URL parameter
+            edittingItem = await TaskService.GetTaskItemsByIdAsync(int.Parse(queryidstr));
+        }
+    }
+
     private void CloseModal()
     {
         showModal = false;
-        editingTaskItem = null;
+       
         StateHasChanged();
     }
 
