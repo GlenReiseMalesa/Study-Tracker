@@ -1,9 +1,14 @@
 ﻿@page "/"
+@using Microsoft.EntityFrameworkCore
 @using Study_Tracker_BlazorApp.Services
 @using Study_Tracker_BlazorApp.Models
 @inject TaskService TaskService
 @inject DatabaseService DatabaseService
 @inject NavigationManager Navigation
+@using Study_Tracker_BlazorApp.Data
+@using SqliteWasmHelper
+@inject ISqliteWasmDbContextFactory<AppDbContext> DbFactoryContext
+
 
 <PageTitle>Home</PageTitle>
 
@@ -207,9 +212,10 @@
     private async Task LoadTaskItems()
     {
         isLoading = true;
-        TaskItems = await TaskService.GetAllTaskItemsAsync();
+        await using var context = await DbFactoryContext.CreateDbContextAsync(); 
+        TaskItems = await context.TaskItems.ToListAsync();
         isLoading = false;
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     private async Task HandleSave(TaskItem TaskItem)

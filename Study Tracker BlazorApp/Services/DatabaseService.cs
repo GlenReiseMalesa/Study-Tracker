@@ -23,21 +23,6 @@ public class DatabaseService
             var created = await context.Database.EnsureCreatedAsync();
             Console.WriteLine($"Database created/checked: {created}");
 
-            //// Add sample data if this is a new database
-            //if (created)
-            //{
-            //    Console.WriteLine("Adding sample data...");
-            //    if (!await context.TaskItems.AnyAsync())
-            //    {
-            //        context.TaskItems.AddRange(
-            //            new Models.TaskItem { Title = "Learn Blazor WASM", IsCompleted = false, CreatedAt = DateTime.Now },
-            //            new Models.TaskItem { Title = "Build a study tracker", IsCompleted = false, CreatedAt = DateTime.Now },
-            //            new Models.TaskItem { Title = "Master SQLite", IsCompleted = false, CreatedAt = DateTime.Now }
-            //        );
-            //        await context.SaveChangesAsync();
-            //        Console.WriteLine(" Sample data added");
-            //    }
-            //}
 
             // Verify table exists
             var tableExists = await context.Database.ExecuteSqlRawAsync(

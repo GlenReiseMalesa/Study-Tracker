@@ -700,88 +700,11 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    
 
-    <script>
-        window.blazorSqlite = {
-            // Helper to wait for FS to be available
-            waitForFS: async function () {
-                let attempts = 0;
-                while (typeof FS === 'undefined' && attempts < 50) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-                if (typeof FS === 'undefined') {
-                    console.error('FS never became available after 5 seconds');
-                    return false;
-                }
-                console.log('FS is ready');
-                return true;
-            },
 
-            loadDatabaseFromCache: async function (filename) {
-                console.log("Loading database from cache:", filename);
-
-                const fsReady = await this.waitForFS();
-                if (!fsReady) return;
-
-                try {
-                    const cache = await caches.open('BlazorSqliteCache');
-                    const cacheKey = `/data/${filename}`;
-                    const cachedResponse = await cache.match(cacheKey);
-
-                    if (cachedResponse) {
-                        const data = await cachedResponse.arrayBuffer();
-                        // Ensure /data directory exists
-                        if (!FS.analyzePath('/data').exists) {
-                            FS.mkdir('/data');
-                        }
-                        FS.writeFile(cacheKey, new Uint8Array(data));
-                        console.log(`✅ Database loaded from cache: ${filename}`);
-                    } else {
-                        console.log(`ℹ️ No cached database found for: ${filename}`);
-                        // Ensure /data directory exists anyway
-                        if (!FS.analyzePath('/data').exists) {
-                            FS.mkdir('/data');
-                            console.log('Created /data directory');
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error loading database:", error);
-                }
-            },
-
-            syncDatabaseToCache: async function (filename) {
-                console.log("Syncing database to cache:", filename);
-
-                const fsReady = await this.waitForFS();
-                if (!fsReady) return;
-
-                try {
-                    const cache = await caches.open('BlazorSqliteCache');
-                    const cacheKey = `/data/${filename}`;
-
-                    // Create directory if it doesn't exist
-                    if (!FS.analyzePath('/data').exists) {
-                        FS.mkdir('/data');
-                        console.log('Created /data directory');
-                    }
-
-                    if (FS.analyzePath(cacheKey).exists) {
-                        const data = FS.readFile(cacheKey);
-                        await cache.put(cacheKey, new Response(data));
-                        console.log(`✅ Database saved to cache: ${filename}`);
-                    } else {
-                        console.log(`⚠️ Database file not found at: ${cacheKey}`);
-                    }
-                } catch (error) {
-                    console.error("Error syncing database:", error);
-                }
-            }
-        };
-    </script>
+ 
     <script src="_framework/blazor.webassembly.js"></script>
-    
+
 </body>
 
 
