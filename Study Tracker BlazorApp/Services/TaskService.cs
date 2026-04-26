@@ -32,5 +32,18 @@ namespace Study_Tracker_BlazorApp.Services
             await context.SaveChangesAsync();
             return TaskItem;
         }
+
+        //DELETE : delete taskitem
+        public async Task<bool> DeleteTaskAsync(int id)
+        {
+            await using var context = await _dbContextFactory.CreateDbContextAsync();
+
+            var task = await context.TaskItems.FindAsync(id);
+            if (task == null) return false;
+
+            context.TaskItems.Remove(task);
+            await context.SaveChangesAsync();
+            return true;
+        }
     }
 }

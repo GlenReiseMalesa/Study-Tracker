@@ -7,6 +7,7 @@
 @inject DatabaseService DatabaseService
 @inject NavigationManager Navigation
 
+
 @using SqliteWasmHelper  
 @inject ISqliteWasmDbContextFactory<AppDbContext> DbFactoryContext
 
@@ -93,78 +94,24 @@
                         <tr><th>Title</th><th>Subject</th><th>Time</th><th>Priority</th><th>Status</th><th>Actions (CRUD)</th></tr>
                     </thead>
                     <tbody>
-                        <!-- Task 1 - Read / Update / Delete demonstration -->
-                        <tr>
-                            <td><strong>Complete Functions & Graphs</strong></td>
-                            <td><span class="badge-subject">Mathematics</span></td>
-                            <td>1.5 hours</td>
-                            <td>🔥 High</td>
-                            <td>⏳ Pending</td>
-                            <td class="action-links">
-                                <a href="#edit-task-1" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-1" class="delete-link" onclick="return confirm('Demo: In a real app, this would delete. No JS alert uses HTML? Actually this uses JS confirm, but for pure no-js, I remove JS confirm? I'll keep simple link to #')">🗑️ Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Task 2 -->
-                        <tr>
-                            <td><strong>Physical Science: Electrostatics</strong></td>
-                            <td><span class="badge-subject">Physical Science</span></td>
-                            <td>45 min</td>
-                            <td>🔥 High</td>
-                            <td>⏳ Pending</td>
-                            <td class="action-links">
-                                <a href="#edit-task-2" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-2" class="delete-link">🗑️ Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Task 3 - Completed example -->
-                        <tr>
-                            <td><strong>English Essay: Mandela's Legacy</strong></td>
-                            <td><span class="badge-subject">English HL</span></td>
-                            <td>50 min</td>
-                            <td>⚡ Medium</td>
-                            <td>🎉 Completed</td>
-                            <td class="action-links">
-                                <a href="#edit-task-3" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-3" class="delete-link">🗑️ Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Task 4 -->
-                        <tr>
-                            <td><strong>Geography Mapwork & GIS</strong></td>
-                            <td><span class="badge-subject">Geography</span></td>
-                            <td>1 hour</td>
-                            <td>🍃 Low</td>
-                            <td>⏳ Pending</td>
-                            <td class="action-links">
-                                <a href="#edit-task-4" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-4" class="delete-link">🗑️ Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Task 5 - Life Orientation -->
-                        <tr>
-                            <td><strong>Study Skills & Goal Setting</strong></td>
-                            <td><span class="badge-subject">Life Orientation</span></td>
-                            <td>30 min</td>
-                            <td>⚡ Medium</td>
-                            <td>🎉 Completed</td>
-                            <td class="action-links">
-                                <a href="#edit-task-5" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-5" class="delete-link">🗑️ Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Task 6 - History -->
-                        <tr>
-                            <td><strong>History: Road to Democracy</strong></td>
-                            <td><span class="badge-subject">History</span></td>
-                            <td>1 hour 15 min</td>
-                            <td>🔥 High</td>
-                            <td>⏳ Pending</td>
-                            <td class="action-links">
-                                <a href="#edit-task-6" class="edit-link">✏️ Edit</a>
-                                <a href="#delete-task-6" class="delete-link">🗑️ Delete</a>
-                            </td>
-                        </tr>
+
+                        @foreach (var taskitem in TaskItems)
+                        {
+                            <!-- Read / Update / Delete demonstration -->
+                            <tr>
+                                <td><strong>@taskitem.Title</strong></td>
+                                <td><span class="badge-subject">@taskitem.Subject</span></td>
+                                <td>@taskitem.EstimatedTime</td>
+                                <td>@taskitem.Priority</td>
+                                <td>@taskitem.IsCompleted</td>
+                                <td class="action-links">
+                                    <a href="#edit-task-1" class="edit-link">✏️ Edit</a>
+                                    <a href="/forms" class="delete-link" @onclick="() => DeleteTaskItem(taskitem.Id)">🗑️ Delete</a>
+                                </td>
+                            </tr>
+                        }
+
+                        
                     </tbody>
                 </table>
             </div>
@@ -230,7 +177,7 @@
     private string newTodoTitle = string.Empty;
     private string newSubject = string.Empty;
     private string newEstimatedTime = string.Empty;
-    private string newPriority = string.Empty;
+    private string newPriority = "medium";
     private string newNotes = string.Empty;
     private bool newIsCompleted = false;
     public int newId = 1;
@@ -244,11 +191,23 @@
     private async Task LoadTaskItems()
     {
         isLoading = true;
-        TaskItems = await TaskService.GetAllTaskItemsAsync();
+        await using var context = await DbFactoryContext.CreateDbContextAsync();
+        TaskItems = await context.TaskItems.ToListAsync();
         isLoading = false;
-        StateHasChanged();
     }
 
+    // DELETE Single task
+    private async Task DeleteTaskItem(int id)
+    {
+      
+            var success = await TaskService.DeleteTaskAsync(id);
+   
+            await LoadTaskItems();
+            
+        
+    }
+
+    //CREATE Single task
     private async Task HandleSave(TaskItem TaskItem)
     {
         if (TaskItem.Id == 0)
