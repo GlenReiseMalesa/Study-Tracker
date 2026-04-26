@@ -70,8 +70,8 @@
                         @foreach (var taskitem in TaskItems){
                             <tr>
                                 
-                                <td><span class="subject-badge">@taskitem.Title</span></td>
-                                <td>@taskitem.Subject</td>
+                                <td><strong>@taskitem.Title</strong></td>
+                                <td><span class="badge-subject">@taskitem.Subject</span></td>
                                 <td>@taskitem.EstimatedTime</td>
                                 <td>@taskitem.Priority</td>
                                 <td>@taskitem.Notes</td>
