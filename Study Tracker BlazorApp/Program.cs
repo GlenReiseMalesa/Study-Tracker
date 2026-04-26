@@ -6,6 +6,8 @@ using Study_Tracker_BlazorApp;
 using Study_Tracker_BlazorApp.Data;
 using Study_Tracker_BlazorApp.Services;
 
+
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -15,7 +17,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 //DB code
 try
-{
+{    // sqlitewasmhelper automatically handles the loadDatabaseFromCache and syncDatabaseToCache logic i was writing manually in my JS script.
     // Your service registration
     builder.Services.AddSqliteWasmDbContextFactory<AppDbContext>(
         opts => opts.UseSqlite("Data Source=app.db"));
