@@ -6,7 +6,9 @@
 @inject TaskService TaskService
 @inject DatabaseService DatabaseService
 @inject NavigationManager Navigation
-@inject IDbContextFactory<AppDbContext> DbContextFactory
+
+@using SqliteWasmHelper  
+@inject ISqliteWasmDbContextFactory<AppDbContext> DbFactoryContext
 
 <PageTitle>Organize Tasks</PageTitle>
 
@@ -310,7 +312,7 @@
                 Notes= newNotes
             };
 
-        await using var context = await DbContextFactory.CreateDbContextAsync();
+        await using var context = await DbFactoryContext.CreateDbContextAsync();
         context.TaskItems.Add(task);
         await context.SaveChangesAsync();
         newTodoTitle = string.Empty;
