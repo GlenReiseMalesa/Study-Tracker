@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SqliteWasmHelper;
 using Study_Tracker_BlazorApp.Data;
 using Study_Tracker_BlazorApp.Models;
 
@@ -7,41 +8,53 @@ namespace Study_Tracker_BlazorApp.Services
     //Contains our CRUD functions
     public class TaskService
     {
-        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
+        private readonly ISqliteWasmDbContextFactory<AppDbContext> _dbContextFactory;
 
 
-        public TaskService(IDbContextFactory<AppDbContext> dbContextFactory)
+        public TaskService(ISqliteWasmDbContextFactory<AppDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }
 
-        // READ : Get all tasks
-        public async Task<List<TaskItem>> GetAllTaskItemsAsync()
+        // READ : Get single taskitem
+        public async Task<TaskItem?> GetTaskItemsByTitleAsync(String Title)
         {
             await using var context = await _dbContextFactory.CreateDbContextAsync();
-
-            return await context.TaskItems.OrderByDescending(static T => T.CreatedAt).ToListAsync();
-        }
-        
-
-        //CREATE : add new taskitem
-        public async Task<TaskItem> CreateTaskItemAsync(TaskItem TaskItem)
-        {
-            await using var context = await _dbContextFactory.CreateDbContextAsync();
-            context.TaskItems.Add(TaskItem);
-            await context.SaveChangesAsync();
-            return TaskItem;
+            return await context.TaskItems
+                .Include(p => p.Subject)
+                .FirstOrDefaultAsync(p => p.Title == Title);
         }
 
-        //DELETE : delete taskitem
+
+        //DELETE : delete a taskitem
         public async Task<bool> DeleteTaskAsync(int id)
         {
             await using var context = await _dbContextFactory.CreateDbContextAsync();
 
-            var task = await context.TaskItems.FindAsync(id);
-            if (task == null) return false;
+            var TaskItem = await context.TaskItems.FindAsync(id);
+            if (TaskItem == null) return false;
 
-            context.TaskItems.Remove(task);
+            context.TaskItems.Remove(TaskItem);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        //UPDATE : update a taskitem
+        public async Task<bool> UpdateTaskAsync(int id, string newTitle, string newSubject, string newEstimatedTime, string newPriority, string newNotes, bool newIsComplete)
+        {
+            await using var context = await _dbContextFactory.CreateDbContextAsync();
+
+            var TaskItem = await context.TaskItems.FindAsync(id);
+            if (TaskItem == null) return false;
+
+            TaskItem.Title = newTitle;
+            TaskItem.CreatedAt = DateTime.Now;
+            TaskItem.Subject = newSubject;
+            TaskItem.Notes = newNotes;
+            TaskItem.EstimatedTime = newEstimatedTime;
+            TaskItem.Priority = newPriority;
+            TaskItem.IsCompleted = newIsComplete;
+
             await context.SaveChangesAsync();
             return true;
         }
