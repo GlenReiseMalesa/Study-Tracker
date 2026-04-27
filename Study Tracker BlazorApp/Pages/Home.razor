@@ -61,6 +61,7 @@
                     </thead>
                     <tbody>
                         @foreach (var taskitem in TaskItems){
+                            
                             <tr>
                                 
                                 <td><strong>@taskitem.Title</strong></td>
@@ -68,7 +69,13 @@
                                 <td>@taskitem.EstimatedTime</td>
                                 <td>@taskitem.Priority</td>
                                 <td>@taskitem.Notes</td>
-                                <td class="checkbox-cell"><input @bind="taskitem.IsCompleted" type="checkbox"></td>
+                               
+                                <td>
+                                        <input type="checkbox" 
+                                        checked="@taskitem.IsCompleted" 
+                                        onchange="@(() =>UpdateTaskItem(taskitem))" />
+                                </td>
+                                
                             </tr>
                         }
 
@@ -116,8 +123,7 @@
     private List<TaskItem> TaskItems = new();
     private bool isLoading = false;
     private bool showModal = false;
-    private TaskItem? editingTaskItem = null;
-
+   
     protected override async Task OnInitializedAsync()
     {
         await LoadTaskItems();
@@ -129,16 +135,23 @@
         isLoading = true;
         await using var context = await DbFactoryContext.CreateDbContextAsync(); 
         TaskItems = await context.TaskItems.ToListAsync();
+
         isLoading = false;
         //StateHasChanged();
     }
 
-  
 
-    private void CloseModal()
+    // Update Single task
+    private async Task UpdateTaskItem(TaskItem? edittingItem)
     {
-        showModal = false;
-        editingTaskItem = null;
-        StateHasChanged();
+
+        edittingItem.IsCompleted = !edittingItem.IsCompleted;
+
+        var success = await TaskService.UpdateTaskAsync(edittingItem.Id, edittingItem.Title, edittingItem.Subject, edittingItem.EstimatedTime, edittingItem.Priority, edittingItem.Notes, edittingItem.IsCompleted);
+
+        await LoadTaskItems();
+
+
     }
+
 }
