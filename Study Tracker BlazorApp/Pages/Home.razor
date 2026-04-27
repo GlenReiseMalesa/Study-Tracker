@@ -19,13 +19,21 @@
     </div>
 
     <!-- Stats Cards – manual but motivating (shows max targets, user fills by checking tasks) -->
+                            @foreach (var taskitem in TaskItems){
+
+                                totalTasks += 1;
+                                @if(taskitem.IsCompleted == true)
+                                {
+                                    totalTasksCompleted += 1;
+                                }
+                            }
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number">📚 8+</div>
+            <div class="stat-number">📚 @totalTasks</div>
             <div class="stat-label">Topics</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">✅ 0 / 24</div>
+            <div class="stat-number">✅ @totalTasksCompleted</div>
             <div class="stat-label">Tasks Completed</div>
         </div>
 
@@ -61,7 +69,9 @@
                     </thead>
                     <tbody>
                         @foreach (var taskitem in TaskItems){
-                            
+
+                 
+
                             <tr>
                                 
                                 <td><strong>@taskitem.Title</strong></td>
@@ -123,7 +133,9 @@
     private List<TaskItem> TaskItems = new();
     private bool isLoading = false;
     private bool showModal = false;
-   
+    private int totalTasks = 0;
+    private int totalTasksCompleted = 0;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadTaskItems();

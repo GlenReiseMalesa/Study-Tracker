@@ -19,18 +19,32 @@
         <div class="sub">No login required · Track your study goals & weekly progress</div>
     </div>
 
+
+    @foreach (var taskitem in TaskItems)
+    {
+
+        totalTasks += 1;
+        @if (taskitem.IsCompleted == true)
+        {
+            totalTasksCompleted += 1;
+        }else
+        {
+            totalTasksPending += 1;
+        }
+    }
+
     <!-- Stats summary (static but shows CRUD concept) -->
     <div class="stats-grid">
-        <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Total Tasks</div></div>
-        <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Completed ✓</div></div>
-        <div class="stat-card"><div class="stat-number">4</div><div class="stat-label">In Progress</div></div>
+        <div class="stat-card"><div class="stat-number">@totalTasks</div><div class="stat-label">Total Tasks</div></div>
+        <div class="stat-card"><div class="stat-number">@totalTasksCompleted</div><div class="stat-label">Completed ✓</div></div>
+        <div class="stat-card"><div class="stat-number">@totalTasksPending</div><div class="stat-label">In Progress</div></div>
         
     </div>
 
     <div class="crud-layout">
         <!-- CREATE / UPDATE PANEL - Manual form for adding/editing tasks (No JS, just UI) -->
         <div class="form-panel">
-            <div class="section-title">✏️ Create / Edit Study Task </div>
+            <div class="section-title">✏️ Create Study Task </div>
             <form action="#" method="get" id="createTaskForm">
                 <!-- Hidden fields to simulate edit mode (pure HTML/CSS) -->
                 <div class="form-group">
@@ -124,7 +138,7 @@
             <div style="overflow-x: auto;">
                 <table class="task-table">
                     <thead>
-                        <tr><th>Title</th><th>Subject</th><th>Time</th><th>Priority</th><th>Status</th><th>Actions (CRUD)</th></tr>
+                        <tr><th>Title</th><th>Subject</th><th>Time</th><th>Priority</th><th>Status</th><th>Actions </th></tr>
                     </thead>
                     <tbody>
 
@@ -196,10 +210,13 @@
     private string newPriority = "medium";
     private string newNotes = string.Empty;
     private bool newIsCompleted = false;
-   
+
     public int newId = 1;
     private TaskItem? edittingItem = null;
 
+    private int totalTasks = 0;
+    private int totalTasksCompleted = 0;
+    private int totalTasksPending = 0;
 
   
 
