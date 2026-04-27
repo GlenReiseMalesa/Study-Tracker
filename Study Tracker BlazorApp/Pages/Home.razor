@@ -22,20 +22,13 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number">📚 8+</div>
-            <div class="stat-label">Subjects Ready</div>
+            <div class="stat-label">Topics</div>
         </div>
         <div class="stat-card">
             <div class="stat-number">✅ 0 / 24</div>
-            <div class="stat-label">Tasks Completed<br>(tick boxes)</div>
+            <div class="stat-label">Tasks Completed</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">⏱️ 2h/day</div>
-            <div class="stat-label">Daily Goal</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">🏆 85%</div>
-            <div class="stat-label">Attendance</div>
-        </div>
+
     </div>
 
     <!-- Main Tracker area: Weekly study plan + Today's tasks (no JS checkboxes) -->
@@ -75,7 +68,7 @@
                                 <td>@taskitem.EstimatedTime</td>
                                 <td>@taskitem.Priority</td>
                                 <td>@taskitem.Notes</td>
-                                <td class="checkbox-cell"><input type="checkbox"></td>
+                                <td class="checkbox-cell"><input @bind="taskitem.IsCompleted" type="checkbox"></td>
                             </tr>
                         }
 
@@ -105,25 +98,17 @@
 
 
 
-    <!-- custom subjects / term planner without JS - just a table with additional subjects to track -->
-    <div style="margin-top: 1.8rem;">
-        <div class="custom-subject-note">
-            🧭 <strong>No login & no JavaScript</strong> – All checkboxes work natively in HTML/CSS. Use them to mark completed topics,
-            weekly sessions or revision blocks. Refresh the page keeps your ticks? Actually, checkboxes state is preserved until page reload/closed.
-            For a persistent tracker across sessions, you'd need local storage (JS), but we designed this as a daily printable / manual tracker.
-            Perfect for students who want a simple, private and secure study companion.
-        </div>
-    </div>
+
 
     <!-- progress summary via a simple manual total (NO JS, but we use static representation) -->
     <div class="footer-note">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
             <span>✨ Track your daily goals: tick off subjects</span>
             <span>📚 #StudySmart #Matric2026 #SouthAfrica</span>
-            <span>⏲️ Recommended: 25 min study + 5 min break (Pomodoro)</span>
+            <span>⏲️ Recommended: 25 min study + 5 min break</span>
         </div>
         <hr style="margin: 0.8rem 0;">
-        <div>Study Tracker App – designed for SA learners. No sign-up, no distractions. All your study plans in one clean HTML page.</div>
+        <div>Study Tracker App – designed for SA learners. No sign-up, no distractions..</div>
     </div>
 </div>
 
