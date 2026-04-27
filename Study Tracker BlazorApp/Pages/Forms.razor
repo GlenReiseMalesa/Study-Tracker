@@ -15,8 +15,8 @@
 
 <div class="tracker-container">
     <div class="header">
-        <h1>📘 CRUD Study Tracker <span class="za-badge">🇿🇦 No JavaScript</span></h1>
-        <div class="sub">Complete Create · Read · Update · Delete Interface | Pure HTML/CSS Demo</div>
+        <h1>📘 Study Tracker <span class="za-badge">🇿🇦 Mzansi</span></h1>
+        <div class="sub">No login required · Track your study goals & weekly progress</div>
     </div>
 
     <!-- Stats summary (static but shows CRUD concept) -->
@@ -24,7 +24,7 @@
         <div class="stat-card"><div class="stat-number">6</div><div class="stat-label">Total Tasks</div></div>
         <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Completed ✓</div></div>
         <div class="stat-card"><div class="stat-number">4</div><div class="stat-label">In Progress</div></div>
-        <div class="stat-card"><div class="stat-number">🎯 CRUD</div><div class="stat-label">Full Control</div></div>
+        
     </div>
 
     <div class="crud-layout">
@@ -53,13 +53,7 @@
                         <option value="Low">🍃 Low</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>✅ Status</label>
-                    <select name="status" @bind="newIsCompleted">
-                        <option value="False">⏳ Pending</option>
-                        <option value="True">🎉 Completed</option>
-                    </select>
-                </div>
+
                 <div class="form-group">
                     <label>📝 Notes</label>
                     <textarea name="notes" rows="2" @bind="newNotes" placeholder="Additional details...">Focus on past papers</textarea>
@@ -69,9 +63,7 @@
                     <button type="reset" class="btn btn-secondary">🗑️ Clear Form</button>
                 </div>
             </form>
-            <div class="info-note">
-                💡 <strong>CRUD Without JS:</strong> Use the form above to design new tasks. For a real backend, this data would be saved to a database. This demo shows the UI/UX of a full CRUD system.
-            </div>
+        
         </div>
 
 
@@ -81,7 +73,7 @@
         <div class="list-panel">
 
             <!-- Edit section -->
-            @if (!string.IsNullOrEmpty(queryidstr) && edittingItem!=null)
+            @if ( edittingItem!=null)
             {
                 
 
@@ -89,39 +81,45 @@
                     <div class="section-title" style="font-size: 1.2rem;">✏️ Update Task </div>
                     <p style="margin-bottom: 10px; font-size:0.85rem;">Click any "Edit" link above to jump — here's a pre-filled edit form for <strong>"Mathematics Revision"</strong></p>
                     <form action="#" method="get">
-                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                            <input type="text" @bind-value="edittingItem.Title" placeholder="Title">
+                        <div style=" flex-wrap: wrap; gap: 12px;">
+                            <div class="form-group">
+                                <lable>Title</lable>
+                                <input type="text" @bind-value="edittingItem.Title" placeholder="Title">
+                            </div>
+                            <div class="form-group">
+                                <lable>Subject</lable>
                             <input type="text" @bind-value="edittingItem.Subject" placeholder="Subject">
+                            </div>
+                            <div class="form-group">
+                                <lable>Estimated Time</lable>
                             <input type="text" @bind-value="edittingItem.EstimatedTime" placeholder="Time">
+                            </div>
+                            <div class="form-group">
+                                <lable>Priority</lable>
                             <select @bind="edittingItem.Priority">
-                                <option>High</option>
-                                <option selected>Medium</option>
-                                <option>Low</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
                             </select>
-                            <select @bind="edittingItem.IsCompleted">
-                                <option selected>Pending</option>
-                                <option>Completed</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary" onclick="@UpdateTaskItem" style="padding: 6px 16px;">💾 Update Task</button>
-                        </div>
-                        <div class="info-note" style="margin-top: 8px;">✅ This demonstrates the UPDATE operation in CRUD. Modify fields and click update (UI demo without backend).</div>
+                            </div>
 
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea name="notes" rows="2" @bind="edittingItem.Notes" placeholder="Additional details..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                            <button type="submit" class="btn btn-primary" onclick="@UpdateTaskItem(edittingItem.Id)" style="padding: 6px 16px;">💾 Update Task</button>
+                            </div>
+                        </div>
+                      
                     </form>
                 </div>
 
             }
 
-            <div class="section-title">📋 Study Task List (CRUD Operations)</div>
+            <div class="section-title">📋 Study Task List </div>
 
-            <!-- Search/filter UI (visual only) -->
-            <div class="search-box">
-                <input type="text" placeholder="🔍 Search by title or subject... (visual filter demo)">
-                <select>
-                    <option>All Tasks</option>
-                    <option>Pending</option>
-                    <option>Completed</option>
-                </select>
-            </div>
 
             <div style="overflow-x: auto;">
                 <table class="task-table">
@@ -138,9 +136,17 @@
                                 <td><span class="badge-subject">@taskitem.Subject</span></td>
                                 <td>@taskitem.EstimatedTime</td>
                                 <td>@taskitem.Priority</td>
-                                <td>@taskitem.IsCompleted</td>
+                                @if (@taskitem.IsCompleted == true)
+                                {
+                                    <td>Completed</td>
+                                }
+                                else
+                                {
+                                    <td>Pending</td>
+                                }
+
                                 <td class="action-links">
-                                    <a href="/forms?queryid=@taskitem.Id" @onclick="() => LoadUpdateTaskItem()" class="edit-link">✏️ Edit</a>
+                                    <a href="/forms" @onclick="() => LoadUpdateTaskItem(taskitem.Id)" class="edit-link">✏️ Edit</a>
                                     <a href="/forms" class="delete-link" @onclick="() => DeleteTaskItem(taskitem.Id)">🗑️ Delete</a>
                                 </td>
                             </tr>
@@ -160,8 +166,8 @@
     <!-- CREATE additional quick-add example -->
     <div class="motivation-card">
         <div class="quote-text">
-            📚 <strong>CRUD Study Tracker - South African Student Edition</strong><br>
-            Create, Read, Update, Delete your study plans. No JavaScript needed — pure HTML/CSS interface with functional forms.
+            📚 <strong>Study Tracker - South African Student Edition</strong><br>
+       
         </div>
         <div class="flag-emojis" style="font-size: 1.8rem;">🇿🇦 ✨📖</div>
     </div>
@@ -170,12 +176,9 @@
 
     <!-- Additional READ-only statistics and info -->
     <div class="footer-note">
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-            <span>✅ <strong>CRUD Operations:</strong> Create (Add forms) | Read (Table list) | Update (Edit links & forms) | Delete (Delete buttons)</span>
-            <span>📌 No JavaScript — 100% HTML5 & CSS3</span>
-        </div>
+  
         <hr>
-        <div>📖 Study Tracker CRUD Page — Designed for Mzansi learners. Use the forms and action buttons to simulate full data management. Ideal for demonstrating backend-ready interface.</div>
+        <div>📖 Designed for Mzansi learners. Use the forms and action buttons to simulate full data management. Ideal for demonstrating backend-ready interface.</div>
         <div style="margin-top: 8px;">🇿🇦 "Education is the great engine of personal development." — Nelson Mandela</div>
     </div>
 </div>
@@ -193,14 +196,12 @@
     private string newPriority = "medium";
     private string newNotes = string.Empty;
     private bool newIsCompleted = false;
+   
     public int newId = 1;
     private TaskItem? edittingItem = null;
 
 
-    //Query id/parameter
-    [Parameter]
-    [SupplyParameterFromQuery(Name = "queryid")]
-    public string? queryidstr { get; set; }
+  
 
 
 
@@ -221,7 +222,7 @@
             edittingItem = await TaskService.GetTaskItemsByIdAsync(int.Parse(queryidstr));
             }
         */
-                isLoading = true;
+                        isLoading = true;
         await using var context = await DbFactoryContext.CreateDbContextAsync();
         TaskItems = await context.TaskItems.ToListAsync();
         isLoading = false;
@@ -239,30 +240,27 @@
     }
 
     // Update Single task
-    private async Task UpdateTaskItem()
+    private async Task UpdateTaskItem(int id)
     {
 
-        int intId = 0;
-        if (!string.IsNullOrEmpty(queryidstr))
-        {
-            intId = int.Parse(queryidstr);
-        }
+  
 
-        var success = await TaskService.UpdateTaskAsync(intId, edittingItem.Title, edittingItem.Subject, edittingItem.EstimatedTime, edittingItem.Priority, edittingItem.Notes, edittingItem.IsCompleted);
-
+       
+        var success = await TaskService.UpdateTaskAsync(id, edittingItem.Title, edittingItem.Subject, edittingItem.EstimatedTime, edittingItem.Priority, edittingItem.Notes, edittingItem.IsCompleted);
+        
         await LoadTaskItems();
 
 
     }
 
     //load the d=single item for editting
-    private async void LoadUpdateTaskItem()
+    private async void LoadUpdateTaskItem(int id)
     {
-        @if (!string.IsNullOrEmpty(queryidstr))
-        {
+    
             // Get the task by ID from URL parameter
-            edittingItem = await TaskService.GetTaskItemsByIdAsync(int.Parse(queryidstr));
-        }
+            edittingItem = await TaskService.GetTaskItemsByIdAsync(id);
+            Navigation.NavigateTo("/forms");
+        
     }
 
     private void CloseModal()
